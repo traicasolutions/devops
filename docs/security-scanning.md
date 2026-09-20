@@ -280,10 +280,10 @@ Each Trivy job uses two scan steps:
 
 | Step type | Output format | Purpose |
 | --- | --- | --- |
-| Readable report | `table` | Prints a clear developer-friendly report in the GitHub Actions log |
-| SARIF gate | `sarif` | Uploads findings to GitHub Security and fails the job on configured severity |
+| SARIF report | `sarif` | Uploads findings to GitHub Security without failing before upload |
+| Readable gate | `table` | Prints a clear developer-friendly report and fails the job on configured severity |
 
-The readable report uses `exit-code: 0`, so developers can see the table output before the job fails. The SARIF gate uses `exit-code: 1`, so the pipeline still fails when matching `HIGH` or `CRITICAL` findings are present.
+The SARIF report uses `exit-code: 0`, so GitHub Security results are still generated and uploaded. The readable gate uses `exit-code: 1`, so the pipeline fails with a table-style report that developers can read directly in the GitHub Actions log.
 
 ### What Trivy Filesystem Scan Covers
 

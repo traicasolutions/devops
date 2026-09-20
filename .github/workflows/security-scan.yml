@@ -64,17 +64,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Show readable filesystem scan report
-        uses: aquasecurity/trivy-action@v0.36.0
-        with:
-          scan-type: fs
-          scan-ref: .
-          format: table
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          exit-code: 0
-          hide-progress: true
-
       - name: Generate filesystem scan SARIF
         uses: aquasecurity/trivy-action@v0.36.0
         with:
@@ -84,7 +73,7 @@ jobs:
           output: trivy-fs-results.sarif
           severity: HIGH,CRITICAL
           ignore-unfixed: true
-          exit-code: 1
+          exit-code: 0
           hide-progress: true
 
       - name: Upload filesystem scan results
@@ -93,6 +82,17 @@ jobs:
         with:
           sarif_file: trivy-fs-results.sarif
           category: trivy-filesystem
+
+      - name: Fail on filesystem vulnerabilities with readable report
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: table
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: 1
+          hide-progress: true
 
   trivy-backend-image:
     name: Trivy Backend Image Scan
@@ -105,16 +105,6 @@ jobs:
       - name: Build backend image
         run: docker build -t todo-backend:${{ github.sha }} ./backend
 
-      - name: Show readable backend image scan report
-        uses: aquasecurity/trivy-action@v0.36.0
-        with:
-          image-ref: todo-backend:${{ github.sha }}
-          format: table
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          exit-code: 0
-          hide-progress: true
-
       - name: Generate backend image scan SARIF
         uses: aquasecurity/trivy-action@v0.36.0
         with:
@@ -123,7 +113,7 @@ jobs:
           output: trivy-backend-image-results.sarif
           severity: HIGH,CRITICAL
           ignore-unfixed: true
-          exit-code: 1
+          exit-code: 0
           hide-progress: true
 
       - name: Upload backend image scan results
@@ -132,6 +122,16 @@ jobs:
         with:
           sarif_file: trivy-backend-image-results.sarif
           category: trivy-backend-image
+
+      - name: Fail on backend image vulnerabilities with readable report
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: todo-backend:${{ github.sha }}
+          format: table
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: 1
+          hide-progress: true
 
   trivy-frontend-image:
     name: Trivy Frontend Image Scan
@@ -144,16 +144,6 @@ jobs:
       - name: Build frontend image
         run: docker build -t todo-frontend:${{ github.sha }} ./frontend
 
-      - name: Show readable frontend image scan report
-        uses: aquasecurity/trivy-action@v0.36.0
-        with:
-          image-ref: todo-frontend:${{ github.sha }}
-          format: table
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          exit-code: 0
-          hide-progress: true
-
       - name: Generate frontend image scan SARIF
         uses: aquasecurity/trivy-action@v0.36.0
         with:
@@ -162,7 +152,7 @@ jobs:
           output: trivy-frontend-image-results.sarif
           severity: HIGH,CRITICAL
           ignore-unfixed: true
-          exit-code: 1
+          exit-code: 0
           hide-progress: true
 
       - name: Upload frontend image scan results
@@ -171,3 +161,13 @@ jobs:
         with:
           sarif_file: trivy-frontend-image-results.sarif
           category: trivy-frontend-image
+
+      - name: Fail on frontend image vulnerabilities with readable report
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: todo-frontend:${{ github.sha }}
+          format: table
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: 1
+          hide-progress: true
