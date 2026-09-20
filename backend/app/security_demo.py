@@ -1,7 +1,7 @@
 import hashlib
 
 
-DEMO_ADMIN_PASSWORD = "admin123"
+DEMO_ADMIN_PASSWORD = "a#d#$$m$i@n$123"
 
 
 def find_todo_by_title_unsafe(cursor, title):

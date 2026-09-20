@@ -276,6 +276,59 @@ The workflow runs three Trivy scans:
 | `trivy-backend-image` | Built backend Docker image | Python base image packages, OS packages, Python dependencies |
 | `trivy-frontend-image` | Built frontend Docker image | Node build image packages, Nginx runtime image packages, npm dependencies when detectable |
 
+Each Trivy job uses two scan steps:
+
+| Step type | Output format | Purpose |
+| --- | --- | --- |
+| Readable report | `table` | Prints a clear developer-friendly report in the GitHub Actions log |
+| SARIF gate | `sarif` | Uploads findings to GitHub Security and fails the job on configured severity |
+
+The readable report uses `exit-code: 0`, so developers can see the table output before the job fails. The SARIF gate uses `exit-code: 1`, so the pipeline still fails when matching `HIGH` or `CRITICAL` findings are present.
+
+### What Trivy Filesystem Scan Covers
+
+The filesystem scan uses:
+
+```yaml
+scan-type: fs
+scan-ref: .
+```
+
+This means Trivy scans the repository folder directly, before the application is packaged into Docker images.
+
+For this application, the filesystem scan can inspect files such as:
+
+| File or folder | Why it matters |
+| --- | --- |
+| `backend/requirements.txt` | Checks Python runtime dependencies for known vulnerabilities |
+| `backend/requirements-dev.txt` | Checks Python test/dev dependencies for known vulnerabilities |
+| `frontend/package.json` | Checks Node.js dependencies declared by the frontend |
+| `frontend/package-lock.json` | Checks exact installed npm dependency versions if the lockfile exists |
+| `backend/Dockerfile` | Checks Dockerfile security and configuration patterns |
+| `frontend/Dockerfile` | Checks frontend Dockerfile security and configuration patterns |
+| `docker-compose.yml` | Checks container configuration and compose-level misconfigurations |
+| `database/init.sql` | Can inspect SQL files as repository content, though vulnerability detection is limited |
+| `.github/workflows/security-scan.yml` | Can inspect workflow/config files as repository content |
+
+Common findings from a filesystem scan:
+
+| Finding area | Example |
+| --- | --- |
+| Dependency vulnerabilities | A vulnerable Python package version in `requirements.txt` |
+| npm vulnerabilities | A vulnerable React/Vite dependency in npm files |
+| Dockerfile misconfigurations | Risky image configuration or running containers as root |
+| Docker Compose misconfigurations | Insecure container settings |
+| IaC issues | Kubernetes, Terraform, Helm, or CloudFormation issues if those files exist |
+| Secrets | Committed API keys, private keys, GitHub tokens, or AWS keys |
+| License metadata | Package license information where available |
+
+Filesystem scan and image scan are different:
+
+| Scan type | What it checks |
+| --- | --- |
+| Filesystem scan | Source files, dependency manifests, Dockerfiles, compose files, and config files |
+| Image scan | The final built Docker image, including OS packages and installed dependencies |
+
 ### Why Trivy Does Not Need an Account
 
 Trivy runs directly on the GitHub Actions runner. It does not need a Trivy account for normal public vulnerability scanning.

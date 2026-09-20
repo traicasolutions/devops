@@ -64,7 +64,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Scan repository filesystem
+      - name: Show readable filesystem scan report
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: table
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: 0
+          hide-progress: true
+
+      - name: Generate filesystem scan SARIF
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: fs
@@ -74,6 +85,7 @@ jobs:
           severity: HIGH,CRITICAL
           ignore-unfixed: true
           exit-code: 1
+          hide-progress: true
 
       - name: Upload filesystem scan results
         if: always()
@@ -93,7 +105,17 @@ jobs:
       - name: Build backend image
         run: docker build -t todo-backend:${{ github.sha }} ./backend
 
-      - name: Scan backend image
+      - name: Show readable backend image scan report
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: todo-backend:${{ github.sha }}
+          format: table
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: 0
+          hide-progress: true
+
+      - name: Generate backend image scan SARIF
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: todo-backend:${{ github.sha }}
@@ -102,6 +124,7 @@ jobs:
           severity: HIGH,CRITICAL
           ignore-unfixed: true
           exit-code: 1
+          hide-progress: true
 
       - name: Upload backend image scan results
         if: always()
@@ -121,7 +144,17 @@ jobs:
       - name: Build frontend image
         run: docker build -t todo-frontend:${{ github.sha }} ./frontend
 
-      - name: Scan frontend image
+      - name: Show readable frontend image scan report
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: todo-frontend:${{ github.sha }}
+          format: table
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: 0
+          hide-progress: true
+
+      - name: Generate frontend image scan SARIF
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: todo-frontend:${{ github.sha }}
@@ -130,6 +163,7 @@ jobs:
           severity: HIGH,CRITICAL
           ignore-unfixed: true
           exit-code: 1
+          hide-progress: true
 
       - name: Upload frontend image scan results
         if: always()
