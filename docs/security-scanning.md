@@ -219,6 +219,56 @@ So for SonarCloud, the only GitHub secret required by this repository is:
 SONAR_TOKEN
 ```
 
+### Failing the Workflow on SonarCloud Issues
+
+The GitHub Actions workflow waits for the SonarCloud Quality Gate result:
+
+```yaml
+- name: Run SonarQube scan
+  uses: SonarSource/sonarqube-scan-action@v8
+  with:
+    args: >
+      -Dsonar.qualitygate.wait=true
+```
+
+This means the SonarCloud scan job fails if the project Quality Gate fails.
+
+SonarCloud does not fail the workflow just because any issue exists. It fails based on the Quality Gate conditions configured in SonarCloud.
+
+Examples of Quality Gate conditions you can configure:
+
+| Gate condition | Example policy |
+| --- | --- |
+| Security rating | Fail if Security rating is worse than `A` |
+| Reliability rating | Fail if Reliability rating is worse than `A` |
+| Maintainability rating | Fail if Maintainability rating is worse than `A` |
+| Vulnerabilities | Fail if vulnerabilities are greater than `0` |
+| Bugs | Fail if bugs are greater than `0` |
+| Code smells | Fail if code smells are greater than an accepted limit |
+| Security hotspots reviewed | Fail if reviewed hotspots are less than `100%` |
+| Coverage | Fail if coverage is below the required percentage |
+| Duplications | Fail if duplicated lines are above the allowed percentage |
+
+To configure this in SonarCloud:
+
+1. Open the SonarCloud project.
+2. Go to **Quality Gates**.
+3. Create or edit a Quality Gate.
+4. Add conditions for the priorities you care about.
+5. Assign that Quality Gate to the project.
+
+For this demo repository, a strict gate could be:
+
+| Metric | Condition |
+| --- | --- |
+| Vulnerabilities | Greater than `0` fails |
+| Bugs | Greater than `0` fails |
+| Security rating | Worse than `A` fails |
+| Reliability rating | Worse than `A` fails |
+| Security hotspots reviewed | Less than `100%` fails |
+| Coverage | Less than `50%` fails |
+| Duplicated lines | Greater than `3%` fails |
+
 ### What SonarQube Covers
 
 SonarQube is mainly used for source code quality and secure coding checks.
