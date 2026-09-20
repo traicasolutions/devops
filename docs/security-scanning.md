@@ -65,6 +65,7 @@ Current configuration:
 ```properties
 sonar.projectKey=todo-app
 sonar.projectName=Todo App
+sonar.organization=replace-with-your-sonarcloud-organization-key
 sonar.projectVersion=1.0
 
 sonar.sources=backend/app,frontend/src
@@ -83,18 +84,135 @@ Add these GitHub repository secrets:
 | Secret | Example | Purpose |
 | --- | --- | --- |
 | `SONAR_TOKEN` | `sqp_xxxxx` | Authenticates the scanner |
-| `SONAR_HOST_URL` | `http://your-sonarqube-server:9000` | SonarQube server URL |
 
-For SonarQube Cloud, use:
+This repository is configured for SonarQube Cloud:
 
 ```text
 SONAR_HOST_URL=https://sonarcloud.io
 ```
 
-For SonarQube Cloud, also add the organization key to `sonar-project.properties`:
+The workflow sets `SONAR_HOST_URL` directly, so only `SONAR_TOKEN` is required as a GitHub secret.
+
+For SonarQube Cloud, replace the organization key in `sonar-project.properties`:
 
 ```properties
 sonar.organization=your-organization-key
+```
+
+### How to Collect SonarCloud Values
+
+Use these steps when using https://sonarcloud.io/.
+
+#### 1. Get `SONAR_TOKEN`
+
+1. Log in to https://sonarcloud.io/.
+2. Click your profile icon in the top-right corner.
+3. Open **My Account**.
+4. Go to **Security**.
+5. Under **Generate Tokens**, enter a token name such as:
+
+```text
+github-actions-todo-app
+```
+
+6. Click **Generate Token**.
+7. Copy the token immediately. SonarCloud only shows it once.
+8. In GitHub, open your repository.
+9. Go to **Settings** > **Secrets and variables** > **Actions**.
+10. Create a new repository secret:
+
+```text
+Name:  SONAR_TOKEN
+Value: <paste-the-token-from-sonarcloud>
+```
+
+Do not commit the token into the repository.
+
+#### 2. Get `sonar.organization`
+
+1. Log in to https://sonarcloud.io/.
+2. Open your organization from the SonarCloud dashboard.
+3. Go to **Organization Settings**.
+4. Find the **Organization Key**.
+5. Copy that value into `sonar-project.properties`:
+
+```properties
+sonar.organization=your-organization-key
+```
+
+Example:
+
+```properties
+sonar.organization=my-devops-org
+```
+
+#### 3. Get `sonar.projectKey`
+
+If the project already exists in SonarCloud:
+
+1. Open https://sonarcloud.io/.
+2. Open your project.
+3. Go to **Project Information** or **Project Settings**.
+4. Copy the **Project Key**.
+5. Put it in `sonar-project.properties`:
+
+```properties
+sonar.projectKey=your-project-key
+```
+
+If you are importing the project from GitHub for the first time:
+
+1. In SonarCloud, click **Analyze new project**.
+2. Select your GitHub organization/repository.
+3. Follow the setup wizard.
+4. SonarCloud will show the generated project key.
+5. Copy that value into `sonar-project.properties`.
+
+Example:
+
+```properties
+sonar.projectKey=my-devops-org_todo-app
+```
+
+#### 4. Set `sonar.projectName`
+
+`sonar.projectName` is the display name shown in SonarCloud. You can choose a readable name.
+
+Example:
+
+```properties
+sonar.projectName=Todo App
+```
+
+This does not need to match the GitHub repository name exactly, but it should be clear for humans.
+
+#### 5. Final SonarCloud Example
+
+After collecting the values, `sonar-project.properties` should look similar to this:
+
+```properties
+sonar.projectKey=my-devops-org_todo-app
+sonar.projectName=Todo App
+sonar.organization=my-devops-org
+sonar.projectVersion=1.0
+
+sonar.sources=backend/app,frontend/src
+sonar.exclusions=**/node_modules/**,**/__pycache__/**,**/dist/**
+
+sonar.python.version=3.12
+sonar.sourceEncoding=UTF-8
+```
+
+The GitHub Actions workflow already sets:
+
+```yaml
+SONAR_HOST_URL: https://sonarcloud.io
+```
+
+So for SonarCloud, the only GitHub secret required by this repository is:
+
+```text
+SONAR_TOKEN
 ```
 
 ### What SonarQube Covers
