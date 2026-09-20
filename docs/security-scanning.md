@@ -69,7 +69,9 @@ sonar.organization=replace-with-your-sonarcloud-organization-key
 sonar.projectVersion=1.0
 
 sonar.sources=backend/app,frontend/src
+sonar.tests=backend/tests
 sonar.exclusions=**/node_modules/**,**/__pycache__/**,**/dist/**
+sonar.python.coverage.reportPaths=coverage.xml
 
 sonar.python.version=3.12
 sonar.sourceEncoding=UTF-8
@@ -197,7 +199,9 @@ sonar.organization=my-devops-org
 sonar.projectVersion=1.0
 
 sonar.sources=backend/app,frontend/src
+sonar.tests=backend/tests
 sonar.exclusions=**/node_modules/**,**/__pycache__/**,**/dist/**
+sonar.python.coverage.reportPaths=coverage.xml
 
 sonar.python.version=3.12
 sonar.sourceEncoding=UTF-8
@@ -229,6 +233,20 @@ Important issue types:
 | Code smells | Maintainability problems |
 | Duplications | Repeated code blocks |
 | Coverage | Test coverage, if reports are provided |
+
+### SonarCloud Result Examples
+
+| SonarCloud result | What it means | Basic example |
+| --- | --- | --- |
+| Security | A real security vulnerability that should be fixed | Building SQL using string concatenation: `"SELECT * FROM todos WHERE title = '" + title + "'"` |
+| Reliability | A likely bug or runtime failure | Calling `todo.title.upper()` when `todo.title` could be `None` |
+| Maintainability | Code smell that makes the code harder to read, change, or test | A very long function with many nested `if` conditions |
+| Security Hotspot | Security-sensitive code that needs human review | Using wildcard CORS such as `allow_origins=["*"]` |
+| Hotspots Reviewed | Percentage of security hotspots reviewed by a developer | `100%` means all hotspots are reviewed or none are pending |
+| Coverage | Percentage of code executed by automated tests | Tests call `health()` and `row_to_dict()`, so those lines are covered |
+| Duplications | Repeated code blocks detected in source files | Two functions containing the same 10-line formatting logic |
+
+For this repository, `backend/app/security_demo.py` intentionally contains examples that can trigger Security, Maintainability, and Duplication findings in SonarCloud.
 
 ### Languages Supported
 
@@ -415,6 +433,25 @@ sonar-scanner \
 4. Review GitHub Security tab for Trivy SARIF findings.
 5. Fix `CRITICAL` and `HIGH` findings before merging.
 6. Track lower-severity issues separately if they are not blocking.
+
+## Demo Issues in This Repository
+
+The file below intentionally contains scanner training examples:
+
+```text
+backend/app/security_demo.py
+```
+
+It is not used by the running Todo API. It exists only to demonstrate how SonarCloud reports issues such as:
+
+| Demo issue | Example pattern |
+| --- | --- |
+| Security | SQL query built with string concatenation |
+| Security hotspot | Weak hashing with MD5 |
+| Maintainability | Complex nested conditional logic |
+| Duplication | Repeated summary formatting logic |
+
+Remove this file before treating the project as production-ready.
 
 ## References
 
